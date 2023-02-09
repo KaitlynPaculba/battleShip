@@ -1,106 +1,121 @@
 var rs = require('readline-sync');
-const opPlace = [];
-const opSunk = [];
-const letters = set('abcdefghij');
-const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-const [] = letters;
-const guess = [];
-const start = rs.keyIn('Press any key to begin', '$<a-z>');
-const aim = rs.question('Enter a location to strike: ');
-const spotOpt = 'a-j 0-9';
-const aimToHit = opPlace.includes(aim);
-const marks = [
-  { id: 'bla', char: '_', pres: true },
-  { id: 'hit', char: 'X', pres: false },
-  { id: 'mis', char: 'O', pres: false },
-  { id: 'shi', char: '/', pres: false }
-]
-let gridSize = buildGrid(10);
+// el in ships is eliminated/ sunk
+// val: 0 is empty, 1 is occupied by player, 2 is occupied by enemy, 3 is hit
 let size = 10;
+const grid = [];
+let headStr = `    `;
+let cellStr = ``;
+let x;
+let y;
+let blank;
+let hit;
+let miss;
+let ship;
+let myShipCount = 5;
+const myShips = [
+  { sid: 1, x: grid[x], y: grid[y], l: 2, pl: false, el: false },
+  { sid: 2, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
+  { sid: 3, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
+  { sid: 4, x: grid[x], y: grid[y], l: 4, pl: false, el: false },
+  { sid: 5, x: grid[x], y: grid[y], l: 5, pl: false, el: false },
+];
+let enShipCount = 5;
+const enemyShips = [
+  { sid: 1, x: grid[x], y: grid[y], l: 2, pl: false, el: false },
+  { sid: 1, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
+  { sid: 1, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
+  { sid: 1, x: grid[x], y: grid[y], l: 4, pl: false, el: false },
+  { sid: 1, x: grid[x], y: grid[y], l: 5, pl: false, el: false },
+];
+const legend = [
+  { id: blank, mark: '|_' },
+  { id: hit, mark: '|X' },
+  { id: miss, mark: '|O' },
+  { id: ship, mark: '=='}
+];
+let enemyLocations = {};
+const letters = ['a ', 'b ', 'c ', 'd ', 'e ', 'f ', 'g ', 'h ', 'i ', 'j '];
+const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const propGrid = [];
 
 
-
-function xOrY(max2, shipLength) {
-  max2 = 1;
-  let result = rand(max2);
-  for (let i = 0; i < ships.length; i++) {
-    if (result == 0) {
-      ships.l2 = (grid[y + shipLength]);
-    } else {
-      ships.l2 = (grid[x + shipLength]);
-    }
-  } 
-}
-
-function rand(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
-
-const opPlaced = {};
-function buildGrid(size) {
-  let grid = [];
-  for (let i = 0; i < size; i++) {
-    grid[i] = [];
-    for (let j = 0; j < size; j++) {
-      grid[i][j] = marks[0].char;
-    }
-  }
-  return grid;
-}
-let op = false;
-
-// const ships = [
-//   { id: 'Two-U', w: (grid[x]), l2: (grid[y]), l: 2, q: 1 },
-//   { id: 'Thr-U', w: (grid[x]), l2: (grid[y]), l: 3, q: 2 },
-//   { id: 'Fou-U', w: (grid[x]), l2: (grid[y]), l: 4, q: 1 },
-//   { id: 'Fiv-U', w: (grid[x]), l2: (grid[y]), l: 5, q: 1 }
-// ];
-//const shipLength = ships.l;
-function print(grid, op) {
-  const cords = buildGrid(grid.length);
-  console.log(cords);
-  for (let i = 0; i < grid.length; i++) {
-    let row = i + ' ';
-    for (let space of grid[i]) {
-      if (op && space == 'O') {
-        row += ' ';
-      } else {
-        row += space + ' ';
-      }
-    }
-    console.log(row);
-  }
-}
-console.table(gridSize);
-
-// function placeShipRand() {
-//   let placed = false;
-//   while (!placed) {
-//     let x = rand(max);
-//     let y = rand(max);
-//     if (!locations[`${x}-${y}`]) {
-//       placeCharacter(x, y, c, grid);
-//       placed = true;
-//       locations[`${x}-${y}`] = true;
-//     }
-//   }
-// }
-
-function aimFunct(x, y, grid) {
-  if (grid[x][y] == marks[0].char) {
-    grid[x][y] == marks[1].char;
-    return true;
-  } else if (grid[x][y] == marks[3].char) {
-    grid[x][y] == marks[2];
-  }
-}
-  
-function startGame() {
-  console.log(start);
-  
-  
+for (let i = 0; i < letters.length; i++) {
+  for (let j = 0; j < letters.length; j++) {
+    let newRow = ({x: letters[i], xn: i, y: nums[j], id: letters[i] + nums[j], val: 0});
+    propGrid.push(newRow);
+  }; 
 };
-startGame();
+let start = rs.keyIn('Press any key to begin the game');
 
-//console.log(ships);
+function createGrid() {
+  for (let i = 0; i < size; i++) {
+    headStr += '|' + nums[i];
+  }
+  grid.push(headStr);
+  for (let j = 0; j < size; j++) {
+    cellStr += letters[j];
+    for (let k = 0; k < size; k++) {
+      cellStr += `${legend[0].mark}`;
+      newObj = [cellStr];
+    }
+    grid.push(newObj);
+    cellStr = ``;
+  }
+}
+createGrid();
+
+//Placing Ships
+let shipStartXn;
+// /\ \/
+let shipStartY;
+// < >
+for (let i = 0; i < myShipCount; i++) {
+  let shipOrientV = true;
+  let placeXY = rs.keyIn('Do you want your ship vertical or horizontal?');
+    if (placeXY.includes('v') || placeXY.includes('V')) {
+      shipOrientV = true;
+    } else
+      if (placeXY.includes('h') || placeXY.includes('H')) {
+        shipOrientV = false;
+      };
+  
+  let shipStart = rs.getRawInput(`Where do you want your ${myShips[i].l} unit long ship to be placed? ex.(a1)`);   
+  for (let i = 0; i < letters.length; i++) {
+    if (shipStart.includes(propGrid[i].id)) {
+      shipStartXn = propGrid[i].xn;
+      shipStartY = propGrid[i].y;
+      placeShips();
+    }
+    myShipCount--
+  }
+function placeShips(shipOrientV, shipStartXn, shipStartY) {
+  if (shipOrientV === true) {
+    for (let i = 0; i < myShips[myShipCount].l; i++) {
+        grid[shipStartXn] = legend[3].mark;
+        shipStartXn + 1;
+      }
+  } else
+    if (shipOrientV === false) {
+      
+  }
+  
+}
+
+}
+
+
+function attack(x, y) {
+
+}
+
+
+
+console.log(grid);
+
+
+
+function randNum() {
+  return Math.floor(Math.random() * Math.floor(max));
+};
+
