@@ -1,17 +1,25 @@
 var rs = require('readline-sync');
 
 // el in ships is eliminated/ sunk
-// val: 0 is empty, 1 is occupied by player, 2 is occupied by enemy, 3 is hit
+// val: 0 is empty, 1 is occupied by player, 2 is hit, 3 is miss;
+// grid offset is 3 characters
+
+let playing = true;
 let size = 10;
 const grid = [];
-let headStr = `    `;
+const enGrid = [];
+let headStr = `  `;
 let cellStr = ``;
+let newObj;
 let x;
 let y;
 let blank;
 let hit;
 let miss;
-let ship;
+let ship; 
+let myLives = 5;
+let enLives = 5; 
+let isEN = false;
 let myShipCount = 5;
 const myShips = [
   { sid: 1, x: grid[x], y: grid[y], l: 2, pl: false, el: false },
@@ -29,93 +37,204 @@ const enemyShips = [
   { sid: 1, x: grid[x], y: grid[y], l: 5, pl: false, el: false },
 ];
 const legend = [
-  { id: blank, mark: '|_' },
-  { id: hit, mark: '|X' },
-  { id: miss, mark: '|O' },
-  { id: ship, mark: '=='}
+  { id: blank, marks: '|_' },
+  { id: ship, marks: '|='},
+  { id: hit, marks: '|X' },
+  { id: miss, marks: '|O' },
+  
 ];
 let enemyLocations = {};
-const letters = ['a ', 'b ', 'c ', 'd ', 'e ', 'f ', 'g ', 'h ', 'i ', 'j '];
+const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
 const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const propGrid = [];
+const enPropGrid = [];
+const boardBreak = '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-';
 
 
-for (let i = 0; i < letters.length; i++) {
+for (let i = 1; i < letters.length + 1; i++) {
   for (let j = 0; j < letters.length; j++) {
-    let newRow = ({x: letters[i], xn: i, y: nums[j], id: letters[i] + nums[j], val: 0});
+    let newRow = ({ id: letters[i - 1] + nums[j], mark: legend[0].marks });
     propGrid.push(newRow);
+    enPropGrid.push(newRow);
   }; 
 };
-let start = rs.keyIn('Press any key to begin the game');
+
+
+
+console.log();
+//let start = rs.keyIn('Press any key to begin the game');
+//game loop for final
+
+  
+ 
+  //set up ships
+  
+    
+   
+
+    
+
+
+//let attackPrompt = rs.getRawInput('Enter a location to strike. ex(a1)');
+
+//let result = propGrid.filter((obj) => obj.id.includes('b3'));
+
+
 
 function createGrid() {
+  let str = '  |'
+  str += nums.join('|');
+  grid.push(str);
+  enGrid.push(str);
+  str = '';
   for (let i = 0; i < size; i++) {
-    headStr += '|' + nums[i];
-  }
-  grid.push(headStr);
-  for (let j = 0; j < size; j++) {
-    cellStr += letters[j];
-    for (let k = 0; k < size; k++) {
-      cellStr += `${legend[0].mark}`;
-      newObj = [cellStr];
+    const result = propGrid.filter((obj) => obj.id.includes(letters[i]))
+    str += letters[i] + ' ';
+    for (let j = 0; j < size; j++) {
+     str += result[j].mark; 
     }
-    grid.push(newObj);
-    cellStr = ``;
-  }
+    grid.push(str);
+    enGrid.push(str);
+    str = '';
+  } 
 }
 createGrid();
 
+
+// DON'T TOUCH
+function ChangeBoard() {
+ let selectId = 'a2';
+  propGrid.map((obj) => {
+  if (obj.id === selectId) {
+    obj.mark = legend[2].marks;
+  }
+}) 
+}
+
+ChangeBoard();
+//console.log(boardBreak);
+createGrid();
+
+function printGameBoard() {
+  console.log(enGrid);
+  console.log(boardBreak);
+  console.log(grid);
+} 
+printGameBoard()
+//console.log(propGrid)
+  ;
+console.log('end');
+
+
 //Placing Ships
-let shipStartXn;
-// /\ \/
-let shipStartY;
-// < >
-for (let i = 0; i < myShipCount; i++) {
-  let shipOrientV = true;
-  let placeXY = rs.keyIn('Do you want your ship vertical or horizontal?');
-    if (placeXY.includes('v') || placeXY.includes('V')) {
-      shipOrientV = true;
-    } else
-      if (placeXY.includes('h') || placeXY.includes('H')) {
-        shipOrientV = false;
-      };
+// let shipStartXn;
+// // /\ \/
+// let shipStartY;
+// // < >
+
+// while (myShipCount > 0) {
+//  let shipStart = rs.question('Where do you want your ship to be placed? ex.(a1) ');
+//   const result = propGrid.filter((obj) => { return obj.id === shipStart});
+//   result.val = 1;
+//   console.log(result)
+//   createGrid();
+//   //ChangeBoard(result);
+//   printGameBoard();
+//   myShipCount--;
+// };
+
+
+
+// function ChangeBoard(result) {
+//   x = result.xn;
+//   y = result.y;
+//   for (let i = 0; i < grid[x].length; i++)
+//     grid[x].split('|');
+//   if (result.val > 0) {
+//     grid[x][i] = legend[result.val].mark; 
+//     cellStr += grid[x][i];
+//   }; 
+// }
+
+// for (let i = 0; i < myShipCount; i++) {
+//   for (let j = 0; j < propGrid.length; i++) {
+//     // if () {
+//     //   console.log('test');
+//     //   propGrid[j].val + 1;
+//     //   createGrid();
+//     //   printGameBoard();
+//     // } else
+//     //   if (j = propGrid.length){
+//     //   console.log('Invalid Entry');
+//     //   shipStart;
+//     // }
+//   }
+// }
+
+
+// function shipPlacementSet() {
   
-  let shipStart = rs.getRawInput(`Where do you want your ${myShips[i].l} unit long ship to be placed? ex.(a1)`);   
-  for (let i = 0; i < letters.length; i++) {
-    if (shipStart.includes(propGrid[i].id)) {
-      shipStartXn = propGrid[i].xn;
-      shipStartY = propGrid[i].y;
-      placeShips();
-    }
-    myShipCount--
-  }
-function placeShips(shipOrientV, shipStartXn, shipStartY) {
-  if (shipOrientV === true) {
-    for (let i = 0; i < myShips[myShipCount].l; i++) {
-        grid[shipStartXn] = legend[3].mark;
-        shipStartXn + 1;
-      }
-  } else
-    if (shipOrientV === false) {
-      
-  }
+// }
+ 
+//let placeXY = rs.keyIn('Do you want your ship vertical or horizontal?');     
+// function vOrH(placeXY) {
+//   for (let i = 0; i < myShipCount; i++) {
+//     let shipOrientV = true;
+    
+//     if (placeXY === 'v' || placeXY === 'V') {
+//       console.log(grid);
+//     } else
+//       if (placeXY === 'h' || placeXY === 'H') {
+//         shipOrientV = false;
+//         console.log(grid);
+//       };
+// };
+// }
+// //vOrH();
+
+// function placeLoop() {
+//   while (myShipCount > 0) {
+//     let s = 0;
+    
+//     for (let i = 0; i < letters.length; i++) {
+//       if (shipStart.includes(propGrid[i].id)) {
+//         propGrid[i].val + 1
+//         //placeShips();
+//       }
+//       myShipCount--;
+//      s += 1;
+//     }
+//     //placeShips()
+//   }
+// }
+//placeLoop()
+
+// function placeShips(shipOrientV, propGrid) {
+//   if (shipOrientV === true) {
+//     for (let i = 0; i < myShips; i++) {
+//       propGrid[i].val + 1;
+//       }
+//   } else
+//     if (shipOrientV === false) {
+
+//   }
   
-}
-
-}
-
-
-function attack(x, y) {
-
-}
+//   }
+  
 
 
 
-console.log(grid);
+// function attack(x, y) {
+
+// }
 
 
 
-function randNum() {
-  return Math.floor(Math.random() * Math.floor(max));
-};
+// console.log('end');
+
+
+
+// function randNum() {
+//   return Math.floor(Math.random() * Math.floor(max));
+// };
 
