@@ -1,47 +1,40 @@
 var rs = require('readline-sync');
 
 // el in ships is eliminated/ sunk
-// val: 0 is empty, 1 is occupied by player, 2 is hit, 3 is miss;
 // grid offset is 3 characters
 
 let playing = true;
 let size = 10;
+let max = 10;
 const grid = [];
 const enGrid = [];
-let headStr = `  `;
-let cellStr = ``;
-let newObj;
-let x;
-let y;
-let blank;
-let hit;
-let miss;
-let ship; 
-let myLives = 5;
-let enLives = 5; 
-let isEN = false;
+//const gridStore = []; let headStr = `  `; let cellStr = ``; let newObj;
+let e1; let e2; let e3; let e4; let e5;
+let x; let y;
+let blank; let hit; let miss; let ship;  let ENBl;
+let myLives = 5; let enLives = 5; 
 let myShipCount = 5;
 const myShips = [
-  { sid: 1, x: grid[x], y: grid[y], l: 2, pl: false, el: false },
-  { sid: 2, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
-  { sid: 3, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
-  { sid: 4, x: grid[x], y: grid[y], l: 4, pl: false, el: false },
-  { sid: 5, x: grid[x], y: grid[y], l: 5, pl: false, el: false },
+  { sid: 1, l: 2, pl: false, el: false },
+  { sid: 2, l: 3, pl: false, el: false },
+  { sid: 3, l: 3, pl: false, el: false },
+  { sid: 4, l: 4, pl: false, el: false },
+  { sid: 5, l: 5, pl: false, el: false },
 ];
 let enShipCount = 5;
 const enemyShips = [
-  { sid: 1, x: grid[x], y: grid[y], l: 2, pl: false, el: false },
-  { sid: 1, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
-  { sid: 1, x: grid[x], y: grid[y], l: 3, pl: false, el: false },
-  { sid: 1, x: grid[x], y: grid[y], l: 4, pl: false, el: false },
-  { sid: 1, x: grid[x], y: grid[y], l: 5, pl: false, el: false },
+  { sid: e1, l: 2, pl: false, el: false },
+  { sid: e2, l: 3, pl: false, el: false },
+  { sid: e3, l: 3, pl: false, el: false },
+  { sid: e4, l: 4, pl: false, el: false },
+  { sid: e5, l: 5, pl: false, el: false },
 ];
 const legend = [
   { id: blank, marks: '|_' },
-  { id: ship, marks: '|='},
+  { id: ship, marks: '|#'},
   { id: hit, marks: '|X' },
   { id: miss, marks: '|O' },
-  
+  { id: ENBl, marks: '|_'},
 ];
 let enemyLocations = {};
 const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
@@ -50,191 +43,219 @@ const propGrid = [];
 const enPropGrid = [];
 const boardBreak = '-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-';
 
+function plGameSet() {
+  for (let i = 1; i < letters.length + 1; i++) {
+    for (let j = 0; j < letters.length; j++) {
+      let newRow = ({ id: letters[i - 1] + nums[j], mark: legend[0].marks, placed: Boolean(false) });
+      propGrid.push(newRow);
+    }; 
+  };
+}
 
-for (let i = 1; i < letters.length + 1; i++) {
-  for (let j = 0; j < letters.length; j++) {
-    let newRow = ({ id: letters[i - 1] + nums[j], mark: legend[0].marks });
-    propGrid.push(newRow);
-    enPropGrid.push(newRow);
+function ENGameSet() {
+  for (let i = 1; i < letters.length + 1; i++) {
+    for (let j = 0; j < letters.length; j++) {
+      let newRow = ({ id: letters[i - 1] + nums[j], mark: legend[0].marks, placed: Boolean(false)});
+      enPropGrid.push(newRow);
+    }; 
+  };
+}
+
+plGameSet();
+ENGameSet();
+
+let start = rs.keyIn('Press any key to begin the game');
+
+function createENGrid() {
+  let result;
+  let str = '  |'
+  str += nums.join('|');
+  enGrid.push(str);
+  str = '';
+  for (let i = 0; i < size; i++) { 
+    result = enPropGrid.filter((obj) => obj.id.includes(letters[i]))
+    str += letters[i] + ' ';
+  for (let j = 0; j < size; j++) {
+    str += result[j].mark; 
+  }
+   enGrid.push(str);
+    str = '';
   }; 
 };
 
-
-
-console.log();
-//let start = rs.keyIn('Press any key to begin the game');
-//game loop for final
-
-  
- 
-  //set up ships
-  
-    
-   
-
-    
-
-
-//let attackPrompt = rs.getRawInput('Enter a location to strike. ex(a1)');
-
-//let result = propGrid.filter((obj) => obj.id.includes('b3'));
-
-
-
-function createGrid() {
+function createPlGrid() {
+  let result;
   let str = '  |'
   str += nums.join('|');
   grid.push(str);
-  enGrid.push(str);
   str = '';
-  for (let i = 0; i < size; i++) {
-    const result = propGrid.filter((obj) => obj.id.includes(letters[i]))
-    str += letters[i] + ' ';
+   for (let i = 0; i < size; i++) {
+      result = propGrid.filter((obj) => obj.id.includes(letters[i]))
+      str += letters[i] + ' ';
     for (let j = 0; j < size; j++) {
-     str += result[j].mark; 
+      str += result[j].mark; 
     }
-    grid.push(str);
-    enGrid.push(str);
-    str = '';
-  } 
+     grid.push(str);
+      str = '';
+  }    
 }
-createGrid();
+createPlGrid();
+createENGrid();
+printGameBoard();
+
+// Player Ships
+while (myShipCount > 0) {
+  let shipStart = rs.question('Where do you want your ship to be placed? ex.(a1) ');  
+  function ChangePlBoard() {
+    grid.length = 0;
+    propGrid.map((obj) => {
+    if (obj.id === shipStart) {
+      obj.mark = legend[1].marks;
+      obj.placed = Boolean(true);
+    }
+  }) 
+}
+  ChangePlBoard();
+  myShipCount--;
+}
 
 
-// DON'T TOUCH
-function ChangeBoard() {
- let selectId = 'a2';
-  propGrid.map((obj) => {
-  if (obj.id === selectId) {
-    obj.mark = legend[2].marks;
+
+function EnRandPick() {
+  let ENRandLett = letters[randNum()];
+  let ENRandNum = nums[randNum()];
+  selectId = `${ENRandLett}${ENRandNum}`
+
+}
+
+
+// Enemy Ships
+while (enShipCount > 0) {
+  EnRandPick();
+  function ChangeENBoard() {
+    enGrid.length = 0;
+    enPropGrid.map((obj) => {
+    if (obj.id === selectId && obj.placed === Boolean(false)) {
+     obj.placed = Boolean(true);
+    }}) 
+  };
+  ChangeENBoard();
+  console.log(selectId)
+  enShipCount--;
+}
+
+reprintGrids();
+
+// player Attack
+while (myLives > 0 && enLives > 0) {
+  attackPrompt = rs.question('Enter a location to Strike. ex.(a1) ');
+  function EnAttack() {
+    grid.length = 0;
+    EnFunc() 
   }
-}) 
+  function PlAttack() {
+    enGrid.length = 0;  
+    playerFunc();
+  }
+  EnAttack();
+  PlAttack();
+  reprintGrids();
+    
+  if (myLives === 0) {
+    console.log('You have been defeated');
+  } else
+    if (enLives === 0) {
+    console.log('All enemy ships are sunk! You win!');
+    }
+  
 }
 
-ChangeBoard();
-//console.log(boardBreak);
-createGrid();
+function EnRandPlace() {
+  let ENRandLet = letters[randNum()];
+  let ENRandNu = nums[randNum()];
+  selectPlace = `${ENRandLet}${ENRandNu}`;
+  propGrid.map((obj) => {
+    if (obj.id === selectPlace && obj.mark === legend[3].marks) {
+      
+      selectPlace = '';
+      EnRandPlace()
+    
+    }
+    
+  })
+}
+
+function EnFunc() {
+  grid.length = 0;
+  selectPlace = '';
+  EnRandPlace();
+    propGrid.map((obj) => {
+     if (obj.id === selectPlace) {
+        if (obj.mark === legend[1].marks && obj.placed === Boolean(true)) {
+          obj.mark = legend[2].marks;
+          myLives--;
+        } else
+          if (obj.mark === legend[0].marks && obj.placed === Boolean(false)) {
+            obj.mark = legend[3].marks;
+          }
+     }
+    })
+   }
+ 
+  
+
+
+
+
+function playerFunc() {
+  enPropGrid.map((obj) => {
+    if (obj.id === attackPrompt) {
+          if (obj.mark === legend[2].marks) {
+            console.log(`Miss! You have already hit ${attackPrompt}`);  
+          } else
+            if (obj.mark === legend[3].marks) {
+              console.log(`Miss! You have already hit ${attackPrompt}`);
+            };
+        }   
+    if (obj.id === attackPrompt && obj.mark !== legend[2].marks && obj.placed === Boolean(true)) {
+      obj.mark = legend[2].marks;
+      enLives--;
+      console.log('Hit!');
+    }
+      if (obj.id === attackPrompt && obj.mark === legend[0].marks && obj.placed === Boolean(false)) {
+      obj.mark = legend[3].marks;
+        console.log('Miss!');
+      } 
+        
+  }); 
+}
+
+//Enemy Attack
+
+function randNum() {
+  return Math.floor(Math.random() * Math.floor(max));
+}; 
+
+function reprintGrids() {
+  ChangePlBoard();
+  createPlGrid(); 
+  ChangeENBoard();
+  createENGrid();
+  livesLeft()
+  printGameBoard();
+}; 
 
 function printGameBoard() {
   console.log(enGrid);
   console.log(boardBreak);
   console.log(grid);
 } 
-printGameBoard()
-//console.log(propGrid)
-  ;
-console.log('end');
-
-
-//Placing Ships
-// let shipStartXn;
-// // /\ \/
-// let shipStartY;
-// // < >
-
-// while (myShipCount > 0) {
-//  let shipStart = rs.question('Where do you want your ship to be placed? ex.(a1) ');
-//   const result = propGrid.filter((obj) => { return obj.id === shipStart});
-//   result.val = 1;
-//   console.log(result)
-//   createGrid();
-//   //ChangeBoard(result);
-//   printGameBoard();
-//   myShipCount--;
-// };
+function livesLeft() {
+  console.log(`Enemy Lives: ${enLives}   My Lives: ${myLives}`);
+}
 
 
 
-// function ChangeBoard(result) {
-//   x = result.xn;
-//   y = result.y;
-//   for (let i = 0; i < grid[x].length; i++)
-//     grid[x].split('|');
-//   if (result.val > 0) {
-//     grid[x][i] = legend[result.val].mark; 
-//     cellStr += grid[x][i];
-//   }; 
-// }
-
-// for (let i = 0; i < myShipCount; i++) {
-//   for (let j = 0; j < propGrid.length; i++) {
-//     // if () {
-//     //   console.log('test');
-//     //   propGrid[j].val + 1;
-//     //   createGrid();
-//     //   printGameBoard();
-//     // } else
-//     //   if (j = propGrid.length){
-//     //   console.log('Invalid Entry');
-//     //   shipStart;
-//     // }
-//   }
-// }
-
-
-// function shipPlacementSet() {
-  
-// }
- 
-//let placeXY = rs.keyIn('Do you want your ship vertical or horizontal?');     
-// function vOrH(placeXY) {
-//   for (let i = 0; i < myShipCount; i++) {
-//     let shipOrientV = true;
-    
-//     if (placeXY === 'v' || placeXY === 'V') {
-//       console.log(grid);
-//     } else
-//       if (placeXY === 'h' || placeXY === 'H') {
-//         shipOrientV = false;
-//         console.log(grid);
-//       };
-// };
-// }
-// //vOrH();
-
-// function placeLoop() {
-//   while (myShipCount > 0) {
-//     let s = 0;
-    
-//     for (let i = 0; i < letters.length; i++) {
-//       if (shipStart.includes(propGrid[i].id)) {
-//         propGrid[i].val + 1
-//         //placeShips();
-//       }
-//       myShipCount--;
-//      s += 1;
-//     }
-//     //placeShips()
-//   }
-// }
-//placeLoop()
-
-// function placeShips(shipOrientV, propGrid) {
-//   if (shipOrientV === true) {
-//     for (let i = 0; i < myShips; i++) {
-//       propGrid[i].val + 1;
-//       }
-//   } else
-//     if (shipOrientV === false) {
-
-//   }
-  
-//   }
   
 
-
-
-// function attack(x, y) {
-
-// }
-
-
-
-// console.log('end');
-
-
-
-// function randNum() {
-//   return Math.floor(Math.random() * Math.floor(max));
-// };
 
